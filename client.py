@@ -1,25 +1,33 @@
 import socket
+import os
+import sys
 
-HOST = '127.0.0.1' #local
-PORT = 5001 # check for match in server
+# Use SERVER_HOST env var in Docker (set to "server"), else localhost for local testing
+HOST = os.environ.get('SERVER_HOST', '127.0.0.1')
+PORT = 5001
 
-
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # for TCP, UDP uses SOCK_DGRAM
-
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
 print(f'Client connected to server host {HOST}, port {PORT}')
 
-while True:
-    message = input(f'Send message to server: ')
-    s.sendall(message.encode('utf-8'))
-    if message == 'exit':
-        break
-    
-    response = s.recv(1024).decode('utf-8')
-    print(f'Response from server: {response}')
-    
+# In Docker (no TTY), run auto mode; otherwise interactive mode for local use
+if sys.stdin.isatty():
+    while True:
+        message = input('Send message to server: ')
+        s.sendall(message.encode('utf-8'))
+        if message == 'exit':
+            break
+        response = s.recv(1024).decode('utf-8')
+        print(f'Response from server: {response}')
+else:
+    messages = ["Hello from client!", "Docker is cool!", "exit"]
+    for msg in messages:
+        s.sendall(msg.encode('utf-8'))
+        if msg != "exit":
+            response = s.recv(1024).decode('utf-8')
+            print(f'Response: {response}')
+
 s.close()
 print('Client closed')
 
