@@ -10,6 +10,8 @@ services:
   # Client 1 - connects to server via Docker network
   client1:
     image: python:3-slim
+    depends_on:
+      - server
     volumes:
       - .:/app # Mount project so client.py is available
     working_dir: /app
@@ -20,6 +22,8 @@ services:
   # Client 2 - same as client1, demonstrates multiple clients
   client2:
     image: python:3-slim
+    depends_on:
+      - server
     volumes:
       - .:/app
     working_dir: /app

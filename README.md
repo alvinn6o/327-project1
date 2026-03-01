@@ -5,6 +5,9 @@
 docker pull nginx:latest
 docker run -d -p 8080:80 --name my-nginx nginx:latest
 
+mounting a volume
+docker run -d -p 8080:80 -v $(pwd)/index.html:/usr/share/nginx/html/index.html nginx:latest
+
 # How to run Task 2 Server with Clients
 docker-compose up --build
 
